@@ -1,0 +1,84 @@
+<script>
+  if (Polymer.RelatedPositionBehavior) {
+    console.warn('RelatedPositionBehavior is already implemented in Polymer!');
+  }
+
+  Polymer.RelatedPositionImpl = {
+    hostAttributes: {
+      'autoPos': ''
+    },
+
+    properties: {
+      halign: {
+        type: String,
+        value: 'left'
+      },
+      valign: {
+        type: String,
+        value: 'bottom'
+      },
+
+      spacing: {
+        type: Object,
+        value: {
+          top: 12,
+          bottom: 12,
+          left: 0,
+          right: 0
+        }
+      }
+    },
+
+    updateRelatedPosition: function(target) {
+      if (!target) {
+        return;
+      }
+
+      var styles = window.getComputedStyle(this);
+      if (styles.position !== 'relative' && styles.position !== 'absolute') {
+        this.style.position = 'relative';
+      }
+
+      var top, left, bottom, right;
+      var ref = this.getBoundingClientRect();
+      var tarRec = target.getBoundingClientRect();
+
+      if (this.halign === 'left') {
+        left = (this.spacing.left || 0);
+
+        if (ref.left + tarRec.width > window.innerWidth) {
+          left = 0 - tarRec.width + ref.width - (this.spacing.right || 0);
+        }
+      } else if (this.halign === 'right') {
+        left = 0 - tarRec.width + ref.width - (this.spacing.right || 0);
+
+        if (ref.right - tarRec.width < 0) {
+          left = (this.spacing.left || 0);
+        }
+      }
+
+      if (this.valign === 'top') {
+        top = 0 - tarRec.height - (this.spacing.top || 0);
+
+        if (top + tarRec.top < 0) {
+          top = ref.height + (this.spacing.bottom || 0);
+        }
+      } else if (this.valign === 'bottom') {
+        top = ref.height + (this.spacing.bottom || 0);
+
+        if (top + tarRec.height + ref.bottom > window.innerHeight) {
+          top = 0 - tarRec.height - (this.spacing.top || 0);
+        }
+      }
+
+      (top !== undefined) && (target.style.top = top + 'px');
+      (left !== undefined) && (target.style.left = left + 'px');
+      (bottom !== undefined) && (target.style.bottom = bottom + 'px');
+      (right !== undefined) && (target.style.right = right + 'px');
+    }
+  };
+
+  Polymer.RelatedPositionBehavior = [
+    Polymer.RelatedPositionImpl
+  ];
+</script>

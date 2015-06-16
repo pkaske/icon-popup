@@ -1,0 +1,39 @@
+<!--
+@license
+Copyright (c) 2015 Peter Kaske <p.kaske@gmail.com>. All rights reserved.
+This code may only be used under the MIT license found at http://opensource.org/licenses/MIT.
+Or see the LICENSE file that comes with this code.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/shadow.html">
+<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
+
+<!--
+Wraps the content for `icon-popup`. Uses `iron-overlay-behavior` to act like a dialog.
+
+@group GUI Elements
+@element icon-popup-content
+@homepage http://pkaske.github.io/icon-popup
+-->
+
+<dom-module id="icon-popup-content">
+  <style>
+    :host {
+      position: absolute;
+      padding: 12px;
+      @apply(--shadow-elevation-2dp);
+    }
+  </style>
+  <template>
+    <content></content>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'icon-popup-content',
+
+    behaviors: [
+      Polymer.IronOverlayBehavior
+    ]
+  });
+</script>

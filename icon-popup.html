@@ -1,0 +1,139 @@
+<!--
+@license
+Copyright (c) 2015 Peter Kaske <p.kaske@gmail.com>. All rights reserved.
+This code may only be used under the MIT license found at http://opensource.org/licenses/MIT.
+Or see the LICENSE file that comes with this code.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="icon-popup-content.html">
+<link rel="import" href="related-position-behavior.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../paper-styles/shadow.html">
+
+<!--
+Consists of a icon and a popup dialog. The icon toggles visibility of the popup.
+
+Example
+
+    <icon-popup>
+      <fa-awesome icon="flag"></fa-awesome>
+      <div popup>
+        Hi! I'm popup!
+      </div>
+    </icon-popup>
+
+@group GUI Elements
+@element icon-popup
+@demo demo/index.html
+@homepage http://pkaske.github.io/icon-popup
+-->
+
+<dom-module id="icon-popup">
+  <style>
+    :host {
+      display: inline-block;
+    }
+
+    #icon {
+      cursor: pointer;
+      padding: 6px;
+
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+
+      @apply(--shadow-transition);
+      @apply(--icon-popup-icon-theme);
+    }
+
+    :host(.open) #icon {
+      @apply(--shadow-elevation-2dp);
+      @apply(--icon-popup-icon-open-theme);
+    }
+
+    #icon:hover {
+      @apply(--shadow-elevation-2dp);
+      @apply(--icon-popup-icon-hover-theme);
+    }
+
+    icon-popup-content {
+      position: absolute;
+      left: 0;
+      top: 0;
+      max-height: none !important; /* iron-overlay-behavior sets this for some reason */
+      max-width: none !important; /* iron-overlay-behavior sets this for some reason */
+      background-color: #fff;
+
+      @apply(--icon-popup-content-theme);
+    }
+  </style>
+  <template>
+    <div id="icon" on-click="_togglePopup">
+      <content select="[icon]"></content>
+    </div>
+    <icon-popup-content id="popup" on-iron-overlay-opened="_updatePos" on-iron-overlay-closed="_closed">
+      <content select="[popup]"></content>
+    </icon-popup-content>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'icon-popup',
+
+    behaviors: [
+      Polymer.RelatedPositionBehavior,
+      Polymer.IronResizableBehavior
+    ],
+
+    listeners: {
+      'iron-resize': '_onResize'
+    },
+
+    /**
+     * Brings the `icon-popup` into 'open' state.
+     */
+    open: function() {
+      if (!this._open) {
+        this._togglePopup();
+      }
+    },
+
+    /**
+     * Brings the `icon-popup` into 'closed' state.
+     */
+    close: function() {
+      if (this._open) {
+        this._togglePopup();
+      }
+    },
+
+    /**
+     * Toggles the state of `icon-popup`.
+     */
+    toggle: function() {
+      this._togglePopup();
+    },
+
+    _togglePopup: function () {
+      this._open = !this._open;
+      this.toggleClass('open', this._open);
+      this.$.popup.toggle();
+    },
+
+    _updatePos: function() {
+      this.updateRelatedPosition(this.$.popup);
+    },
+
+    _closed: function() {
+      this._open = false;
+      this.toggleClass('open', this._open);
+    },
+
+    _onResize: function() {
+      if (this._open) {
+        this.updateRelatedPosition(this.$.popup);
+      }
+    }
+  });
+</script>
