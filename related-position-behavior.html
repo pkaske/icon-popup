@@ -39,35 +39,42 @@
         this.style.position = 'relative';
       }
 
+      var padding = {
+        left: parseInt(styles.paddingLeft),
+        right: parseInt(styles.paddingRight),
+        top: parseInt(styles.paddingTop),
+        bottom: parseInt(styles.paddingBottom)
+      };
+
       var top, left, bottom, right;
       var ref = this.getBoundingClientRect();
       var tarRec = target.getBoundingClientRect();
 
       if (this.halign === 'left') {
-        left = (this.spacing.left || 0);
+        left = (this.spacing.left || 0) + padding.left;
 
         if (ref.left + tarRec.width > window.innerWidth) {
-          left = 0 - tarRec.width + ref.width - (this.spacing.right || 0);
+          left = 0 - tarRec.width + ref.width - (this.spacing.right || 0) - padding.right;
         }
       } else if (this.halign === 'right') {
-        left = 0 - tarRec.width + ref.width - (this.spacing.right || 0);
+        left = 0 - tarRec.width + ref.width - (this.spacing.right || 0) - padding.right;
 
         if (ref.right - tarRec.width < 0) {
-          left = (this.spacing.left || 0);
+          left = (this.spacing.left || 0) + padding.left;
         }
       }
 
       if (this.valign === 'top') {
-        top = 0 - tarRec.height - (this.spacing.top || 0);
+        top = 0 - tarRec.height - (this.spacing.top || 0) + padding.top;
 
         if (top + tarRec.top < 0) {
-          top = ref.height + (this.spacing.bottom || 0);
+          top = ref.height + (this.spacing.bottom || 0) - padding.bottom;
         }
       } else if (this.valign === 'bottom') {
-        top = ref.height + (this.spacing.bottom || 0);
+        top = ref.height + (this.spacing.bottom || 0) - padding.bottom;
 
         if (top + tarRec.height + ref.bottom > window.innerHeight) {
-          top = 0 - tarRec.height - (this.spacing.top || 0);
+          top = 0 - tarRec.height - (this.spacing.top || 0) + padding.top;
         }
       }
 
