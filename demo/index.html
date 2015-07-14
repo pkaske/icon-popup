@@ -16,38 +16,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../icon-popup.html">
   <link rel="import" href="../../fa-awesome/fa-awesome.html">
+  <link rel="import" href="../../paper-styles/shadow.html">
 
   <style is="custom-style">
       :root {
-        --icon-popup-content-theme: {
+        --icon-popup: {
+          /* general styles go here */
+        };
+
+        --icon-popup-disabled: {
+          /* styles for disabled icon-popups go here */
+        };
+
+        --icon-popup-content: {
           /* styles for the popup content go here */
         };
 
-        --icon-popup-icon-theme: {
-          /* styles for the icon go here */
+        --icon-popup-content: {
+          /* styles for the popup content go here */
         };
 
-        --icon-popup-icon-open-theme: {
+        --icon-popup-icon: {
+          /* styles for the popup icon go here */
+          color: red;
+        };
+
+        --icon-popup-icon-open: {
           /* style for the icon in open state go here */
         };
 
-        --icon-popup-icon-hover-theme: {
+        --icon-popup-icon-hover: {
           /* style for the icon in hover state go here */
+        };
+
+        --icon-popup-icon-disabled: {
+          /* styles for the icon if the control is disabled go here */
         };
       }
 
       .whatsapp-icon-popup {
-        --icon-popup-icon-theme: {
+        --icon-popup-icon: {
           border-radius: 50%;
           width: 25px;
           height: 25px;
           text-align: center;
           line-height: 25px;
+          @apply(--shadow-transition);
         };
 
-        --icon-popup-icon-open-theme: {
+        --icon-popup-icon-hover: {
+          @apply(--shadow-elevation-2dp);
+        };
+
+        --icon-popup-icon-open: {
+          @apply(--shadow-elevation-2dp);
           background-color: green;
           color: #fff;
+        };
+
+        --icon-popup-icon-disabled: {
+          color: #c1c1c1;
         };
       }
   </style>

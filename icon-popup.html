@@ -8,7 +8,6 @@ Or see the LICENSE file that comes with this code.
 <link rel="import" href="icon-popup-content.html">
 <link rel="import" href="../related-position-behavior/related-position-behavior.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
-<link rel="import" href="../paper-styles/shadow.html">
 
 <!--
 Consists of a icon and a popup dialog. The icon toggles visibility of the popup.
@@ -24,7 +23,7 @@ Example
 
 @group GUI Elements
 @element icon-popup
-@demo demo/index.html
+@demo http://pkaske.github.io/icon-popup/components/icon-popup/demo/index.html
 @homepage http://pkaske.github.io/icon-popup
 -->
 
@@ -32,6 +31,8 @@ Example
   <style>
     :host {
       display: inline-block;
+
+      @apply(--icon-popup);
     }
 
     #icon {
@@ -43,18 +44,15 @@ Example
       -ms-user-select: none;
       user-select: none;
 
-      @apply(--shadow-transition);
-      @apply(--icon-popup-icon-theme);
+      @apply(--icon-popup-icon);
     }
 
     :host(.open) #icon {
-      @apply(--shadow-elevation-2dp);
-      @apply(--icon-popup-icon-open-theme);
+      @apply(--icon-popup-icon-open);
     }
 
     #icon:hover {
-      @apply(--shadow-elevation-2dp);
-      @apply(--icon-popup-icon-hover-theme);
+      @apply(--icon-popup-icon-hover);
     }
 
     icon-popup-content {
@@ -65,7 +63,16 @@ Example
       max-width: none !important; /* iron-overlay-behavior sets this for some reason */
       background-color: #fff;
 
-      @apply(--icon-popup-content-theme);
+      @apply(--icon-popup-content);
+    }
+
+    :host([disabled]) {
+      pointer-events: none;
+      @apply(--icon-popup-disabled);
+    }
+
+    :host([disabled]) #icon {
+      @apply(--icon-popup-icon-disabled);
     }
   </style>
   <template>
