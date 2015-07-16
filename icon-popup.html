@@ -30,14 +30,14 @@ Example
 <dom-module id="icon-popup">
   <style>
     :host {
-      display: inline-block;
+      @apply(--layout);
+      @apply(--layout-center-center);
 
       @apply(--icon-popup);
     }
 
     #icon {
       cursor: pointer;
-      padding: 6px;
 
       -webkit-user-select: none;
       -moz-user-select: none;
