@@ -17,14 +17,15 @@ Wraps the content for `icon-popup`. Uses `iron-overlay-behavior` to act like a d
 -->
 
 <dom-module id="icon-popup-content">
-  <style>
-    :host {
-      position: absolute;
-      padding: 12px;
-      @apply(--shadow-elevation-2dp);
-    }
-  </style>
   <template>
+    <style>
+      :host {
+        position: absolute;
+        padding: 12px;
+        @apply(--shadow-elevation-2dp);
+      }
+    </style>
+    
     <content></content>
   </template>
 </dom-module>

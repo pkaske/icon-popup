@@ -1,6 +1,6 @@
 {
   "name": "icon-popup",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "authors": [
     "Peter Kaske <p.kaske@gmail.com>"
   ],
@@ -20,11 +20,11 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.0.0",
     "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#~1.0.2",
-    "related-position-behavior": "pkaske/related-position-behavior#^1.0.0"
+    "related-position-behavior": "pkaske/related-position-behavior#^1.0.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#~1.0.4",
-    "fa-awesome": "^1.0.0",
-    "paper-styles": "PolymerElements/paper-styles#^1.0.0"
+    "fa-awesome": "^1.0.0"
   }
 }
