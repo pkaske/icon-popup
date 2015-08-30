@@ -1,0 +1,40 @@
+{
+  "name": "icon-popup",
+  "authors": [
+    "Peter Kaske <p.kaske@gmail.com>"
+  ],
+  "description": "Polymer element that shows a popup after you click a icon. Build with Polymer.",
+  "license": "MIT",
+  "keywords": [
+    "polymer",
+    "web-components",
+    "popup"
+  ],
+  "main": "icon-popup.html",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "related-position-behavior": "pkaske/related-position-behavior#^2.0.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
+    "iron-media-query": "PolymerElements/iron-media-query#^1.0.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#~1.0.4",
+    "fa-awesome": "^1.0.0"
+  },
+  "homepage": "https://github.com/pkaske/icon-popup",
+  "_release": "5b7f057093",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "5b7f057093b18f5a160deea4cf920c4da39333ef"
+  },
+  "_source": "git://github.com/pkaske/icon-popup.git",
+  "_target": "master",
+  "_originalSource": "pkaske/icon-popup",
+  "_direct": true
+}

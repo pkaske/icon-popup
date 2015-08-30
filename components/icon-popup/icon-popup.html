@@ -1,0 +1,178 @@
+<!--
+@license
+Copyright (c) 2015 Peter Kaske <p.kaske@gmail.com>. All rights reserved.
+This code may only be used under the MIT license found at http://opensource.org/licenses/MIT.
+Or see the LICENSE file that comes with this code.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="icon-popup-content.html">
+<link rel="import" href="../related-position-behavior/related-position-behavior.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<!--
+Consists of a icon and a popup dialog. The icon toggles visibility of the popup.
+
+The popup content switches into a mobile friendly mode if opened on a small screen.
+It's then fixed on the bottom of the window and slide up and down filling the whole with of the screen.
+You can provide a `popup-slider` icon to show in the responsive version that indicates touch actions.
+
+If any control inside the popup has the `popup-close` attribute, it triggers the `close()` function on click.
+
+Example
+
+```html
+    <icon-popup>
+      <fa-awesome popup-icon icon="flag"></fa-awesome>
+      <fa-awesome popup-slider icon="angle-down"></fa-awesome>
+      <div popup>
+        Hi! I'm popup!
+        <button popup-close>Close the popup</button>
+      </div>
+    </icon-popup>
+```
+
+@group GUI Elements
+@element icon-popup
+@demo demo/index.html
+@homepage http://pkaske.github.io/icon-popup
+-->
+
+<dom-module id="icon-popup">
+  <template>
+    <style>
+      :host {
+        @apply(--layout);
+        @apply(--layout-center-center);
+
+        @apply(--icon-popup);
+      }
+
+      #icon {
+        cursor: pointer;
+
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        @apply(--icon-popup-icon);
+      }
+
+      :host(.open) #icon {
+        @apply(--icon-popup-icon-open);
+      }
+
+      #icon:hover {
+        @apply(--icon-popup-icon-hover);
+      }
+
+      icon-popup-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      :host([disabled]) {
+        pointer-events: none;
+        @apply(--icon-popup-disabled);
+      }
+
+      :host([disabled]) #icon {
+        @apply(--icon-popup-icon-disabled);
+      }
+    </style>
+
+    <div id="icon" on-click="_togglePopup">
+      <content select="[popup-icon]"></content>
+
+    </div>
+    <icon-popup-content id="popup" on-is-open-changed="_isOpenChanged">
+      <content select="[popup-slider]"></content>
+      <content select="[popup]"></content>
+    </icon-popup-content>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: 'icon-popup',
+
+    behaviors: [
+      Polymer.RelatedPositionBehavior,
+      Polymer.IronResizableBehavior
+    ],
+
+    listeners: {
+      'iron-resize': '_onResize',
+      'click': '_cancelDocClickJob'
+    },
+
+    /**
+     * Get the popup element.
+     */
+    get popup() {
+      return this.$.popup;
+    },
+
+    /**
+     * Brings the `icon-popup` into 'open' state.
+     */
+    open: function() {
+      if (!this.popup.isOpen) {
+        this._togglePopup();
+      }
+    },
+
+    /**
+     * Brings the `icon-popup` into 'closed' state.
+     */
+    close: function() {
+      if (this.popup.isOpen) {
+        this._togglePopup();
+      }
+    },
+
+    /**
+     * Toggles the state of the `popup`.
+     */
+    toggle: function() {
+      this._togglePopup();
+    },
+
+    _togglePopup: function () {
+      if (this.popup.isOpen) {
+        this.$.popup.close();
+      } else {
+        this.$.popup.open();
+      }
+
+      this._open = !this._open;
+      this.toggleClass('open', this.popup.isOpen);
+      this._updatePos();
+    },
+
+    _isOpenChanged: function(e) {
+      this.toggleClass('open', this.popup.isOpen);
+    },
+
+    _updatePos: function() {
+      this.updateRelatedPosition(this.popup);
+    },
+
+    _closed: function() {
+      this.toggleClass('open', this.popup.isOpen);
+    },
+
+    _onResize: function() {
+      if (this.popup.isOpen) {
+        this.updateRelatedPosition(this.$.popup);
+      }
+    },
+
+    _cancelDocClickJob: function() {
+      if (this.popup._docClickJob) {
+        this.cancelAsync(this.popup._docClickJob);
+        this.popup._docClickJob = null;
+      }
+    }
+  });
+</script>

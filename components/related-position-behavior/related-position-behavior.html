@@ -1,0 +1,116 @@
+<script>
+  if (Polymer.RelatedPositionBehavior) {
+    console.warn('RelatedPositionBehavior is already implemented in Polymer!');
+  }
+
+  Polymer.RelatedPositionImpl = {
+    hostAttributes: {
+      'autoPos': ''
+    },
+
+    properties: {
+
+      /**
+       * Horizontal alignment of the target relative to the host
+       */
+      halign: {
+        type: String,
+        value: 'left'
+      },
+
+      /**
+       * Vertical alignment of the target relative to the host
+       */
+      valign: {
+        type: String,
+        value: 'bottom'
+      },
+
+      /**
+       * Additional spacing between the target and the host
+       */
+      spacing: {
+        type: Object,
+        value: function() {
+          return {
+            top: 12,
+            bottom: 12,
+            left: 0,
+            right: 0
+          };
+        }
+      }
+    },
+
+    /**
+     * Sets the correct positon on the target.
+     * The target is the element that is positioned.
+     */
+    updateRelatedPosition: function(target) {
+      if (!target) {
+        return;
+      }
+
+      var styles = window.getComputedStyle(this);
+      if (styles.position !== 'relative' && styles.position !== 'absolute') {
+        this.style.position = 'relative';
+      }
+
+      var padding = {
+        left: parseInt(styles.paddingLeft),
+        right: parseInt(styles.paddingRight),
+        top: parseInt(styles.paddingTop),
+        bottom: parseInt(styles.paddingBottom)
+      };
+
+      var top, left, bottom, right;
+      var ref = this.getBoundingClientRect();
+      var tarRec = target.getBoundingClientRect();
+
+      if (this.halign === 'right') {
+        left = (this.spacing.left || 0) + padding.left;
+
+        if (ref.left + tarRec.width > window.innerWidth) {
+          left = 0 - tarRec.width + ref.width - (this.spacing.right || 0) - padding.right;
+        }
+      } else if (this.halign === 'left') {
+        left = 0 - tarRec.width + ref.width - (this.spacing.right || 0) - padding.right;
+
+        if (ref.right - tarRec.width < 0) {
+          left = (this.spacing.left || 0) + padding.left;
+        }
+      }
+
+      if (this.valign === 'top') {
+        // Calc top coordinate of the target
+        top = 0 - tarRec.height - (this.spacing.top || 0) + padding.top;
+        // Check if the new coordinate would reach outside the window.
+        if (top + tarRec.top < 0) {
+          // Reaches outside, switch to down
+          top = ref.height + (this.spacing.bottom || 0) - padding.bottom;
+        }
+      } else if (this.valign === 'bottom') {
+        top = ref.height + (this.spacing.bottom || 0) - padding.bottom;
+
+        // Check if the target would reach outside the bottom border of the window.
+        if (top + tarRec.height + ref.bottom > window.innerHeight) {
+          var altTop = 0 - tarRec.height - (this.spacing.top || 0) + padding.top;
+          // Check if the alternative coordinate doesn't make the target reach ouside the top border of the window.
+          // In the end, we prefer the bottom alignment over top alignment to keep the content reachable for the user.
+          if (altTop + tarRec.top > 0) {
+            top = altTop;
+          }
+        }
+      }
+
+      (top !== undefined) && (target.style.top = top + 'px');
+      (left !== undefined) && (target.style.left = left + 'px');
+      (bottom !== undefined) && (target.style.bottom = bottom + 'px');
+      (right !== undefined) && (target.style.right = right + 'px');
+    }
+  };
+
+  Polymer.RelatedPositionBehavior = [
+    Polymer.RelatedPositionImpl
+  ];
+</script>

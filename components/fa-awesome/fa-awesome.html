@@ -1,0 +1,169 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../neon-animation/neon-animation.html">
+
+<!--
+Element providing solution to no problem in particular.
+
+##### Example with label
+
+    <fa-awesome icon="flag">A label for the icon</fa-awesome>
+
+##### Example with label placed on the left side
+
+    <fa-awesome icon="chevron-right" label-left>Go right</fa-awesome>
+
+@element fa-awesome
+@blurb Element providing solution to no problem in particular.
+@status alpha
+@homepage http://pkaske.github.io/fa-awesome
+-->
+<dom-module id="fa-awesome">
+    <link rel="import" type="css" href="fa-awesome.css">
+    <link rel="import" type="css" href="../font-awesome/css/font-awesome.min.css">
+    <template>
+        <div id="wrap">
+            <i id="i" class="fa"></i>
+            <span id="label"><content></content></span>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'fa-awesome',
+
+        behaviors: [
+            Polymer.NeonAnimationRunnerBehavior
+        ],
+
+        properties: {
+            /**
+             * Name of the font awesome icon to show. Use the pure name without the 'fa-'.
+             *
+             * @property icon
+             * @type string
+             * @default ''
+             */
+            icon: {
+                type: String,
+                observer: 'iconChanged',
+                value: 'flag'
+            },
+
+            size: {
+                type: String,
+                observer: 'sizeChanged',
+                value: ''
+            },
+
+            /**
+             * If the 'label-left' attribute is set the label is placed left (instead of right) from the icon.
+             *
+             * @property labelLeft
+             * @type bool
+             * @default false
+             */
+            labelLeft: {
+                type: Boolean,
+                observer: 'labelLeftChanged'
+            },
+
+            animated: {
+                type: Boolean,
+                value: false,
+                observer: 'animatedChanged'
+            },
+
+            visible: {
+                type: Boolean
+            },
+
+            animationConfig: {
+                value: function() {
+                    return {
+                        'entry': [{
+                            name: 'fade-in-animation',
+                            node: this
+                        }, {
+                            name: 'scale-up-animation',
+                            node: this
+                        }],
+                        'exit': [{
+                            name: 'fade-out-animation',
+                            node: this
+                        }, {
+                            name: 'scale-down-animation',
+                            node: this
+                        }]
+                    };
+                }
+            }
+        },
+
+        listeners: {
+            'neon-animation-finish': '_onNeonAnimationFinish'
+        },
+
+        attached: function() {
+            if (this.$.label.textContent.length == 0) {
+                this.toggleClass('hide', true, this.$.label);
+            }
+        },
+
+        ready: function() {
+            if (this.visible && this.animated) {
+                this.show();
+            }
+        },
+
+        iconChanged: function(newValue, oldValue) {
+            this.toggleClass('fa-' + oldValue, false, this.$.i);
+            this.toggleClass('fa-' + newValue, true, this.$.i);
+        },
+
+        sizeChanged: function(newValue, oldValue) {
+            if (newValue != 'lg' && newValue != '') {
+                this.size = newValue = parseInt(newValue) + 'x';
+            }
+
+            if (newValue == '') {
+                this.toggleClass('fa-' + oldValue, false, this.$.i);
+                return;
+            }
+
+            this.toggleClass('fa-' + oldValue, false, this.$.i);
+            this.toggleClass('fa-' + newValue, true, this.$.i);
+        },
+
+        labelLeftChanged: function(newValue) {
+            this.toggleClass('reverse', newValue, this.$.wrap);
+        },
+
+        animatedChanged: function(newValue, oldValue) {
+            if (!oldValue && newValue == true) {
+                this.playAnimation('exit');
+            }
+        },
+
+        show: function() {
+            if (!this.animated) return;
+
+            this.visible = true;
+            this.style.display = 'inline-block';
+            this.playAnimation('entry');
+        },
+
+        hide: function() {
+            if (!this.animated) return;
+
+            this.visible = false;
+            this.playAnimation('exit');
+        },
+
+        _onNeonAnimationFinish: function() {
+            if (!this.visible) {
+                this.style.display = 'none';
+            }
+        }
+    });
+</script>
