@@ -11,19 +11,24 @@ Or see the LICENSE file that comes with this code.
 
 <!--
 Consists of a icon and a popup dialog. The icon toggles visibility of the popup.
+The popup content switches into a mobile friendly mode if opened on a small screen.
+It then fixiates on the bottom of the window and slide up and down filling the whole with of the screen.
 
 Example
 
+```html
     <icon-popup>
       <fa-awesome icon="flag"></fa-awesome>
       <div popup>
         Hi! I'm popup!
+        <button popup-close>Close the popup</button>
       </div>
     </icon-popup>
+```
 
 @group GUI Elements
 @element icon-popup
-@demo http://pkaske.github.io/icon-popup/components/icon-popup/demo/index.html
+@demo demo/index.html
 @homepage http://pkaske.github.io/icon-popup
 -->
 
@@ -60,11 +65,6 @@ Example
         position: absolute;
         left: 0;
         top: 0;
-        max-height: none !important; /* iron-overlay-behavior sets this for some reason */
-        max-width: none !important; /* iron-overlay-behavior sets this for some reason */
-        background-color: #fff;
-
-        @apply(--icon-popup-content);
       }
 
       :host([disabled]) {
@@ -76,11 +76,13 @@ Example
         @apply(--icon-popup-icon-disabled);
       }
     </style>
-    
+
     <div id="icon" on-click="_togglePopup">
-      <content select="[icon]"></content>
+      <content select="[popup-icon]"></content>
+
     </div>
-    <icon-popup-content id="popup" on-iron-overlay-opened="_updatePos" on-iron-overlay-closed="_closed">
+    <icon-popup-content id="popup" on-is-open-changed="_isOpenChanged">
+      <content select="[popup-slider]"></content>
       <content select="[popup]"></content>
     </icon-popup-content>
   </template>
@@ -95,14 +97,19 @@ Example
     ],
 
     listeners: {
-      'iron-resize': '_onResize'
+      'iron-resize': '_onResize',
+      'click': '_cancelDocClickJob'
+    },
+
+    get popup() {
+      return this.$.popup;
     },
 
     /**
      * Brings the `icon-popup` into 'open' state.
      */
     open: function() {
-      if (!this._open) {
+      if (!this.popup.isOpen) {
         this._togglePopup();
       }
     },
@@ -111,7 +118,7 @@ Example
      * Brings the `icon-popup` into 'closed' state.
      */
     close: function() {
-      if (this._open) {
+      if (this.popup.isOpen) {
         this._togglePopup();
       }
     },
@@ -124,23 +131,39 @@ Example
     },
 
     _togglePopup: function () {
+      if (this.popup.isOpen) {
+        this.$.popup.close();
+      } else {
+        this.$.popup.open();
+      }
+
       this._open = !this._open;
-      this.toggleClass('open', this._open);
-      this.$.popup.toggle();
+      this.toggleClass('open', this.popup.isOpen);
+      this._updatePos();
+    },
+
+    _isOpenChanged: function(e) {
+      this.toggleClass('open', this.popup.isOpen);
     },
 
     _updatePos: function() {
-      this.updateRelatedPosition(this.$.popup);
+      this.updateRelatedPosition(this.popup);
     },
 
     _closed: function() {
-      this._open = false;
-      this.toggleClass('open', this._open);
+      this.toggleClass('open', this.popup.isOpen);
     },
 
     _onResize: function() {
-      if (this._open) {
+      if (this.popup.isOpen) {
         this.updateRelatedPosition(this.$.popup);
+      }
+    },
+
+    _cancelDocClickJob: function() {
+      if (this.popup._docClickJob) {
+        this.cancelAsync(this.popup._docClickJob);
+        this.popup._docClickJob = null;
       }
     }
   });

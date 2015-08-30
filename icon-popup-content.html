@@ -6,7 +6,8 @@ Or see the LICENSE file that comes with this code.
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/shadow.html">
-<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
 <!--
 Wraps the content for `icon-popup`. Uses `iron-overlay-behavior` to act like a dialog.
@@ -22,10 +23,60 @@ Wraps the content for `icon-popup`. Uses `iron-overlay-behavior` to act like a d
       :host {
         position: absolute;
         padding: 12px;
+        background-color: #fff;
         @apply(--shadow-elevation-2dp);
+
+        @apply(--icon-popup-content);
+      }
+
+      #closeSlider {
+        display: none;
+      }
+
+      @media all and (min-width: 0) and (max-width: 480px) {
+        :host {
+          display: block;
+          position: fixed !important;
+          z-index: 1;
+          bottom: 0 !important;
+          top: auto !important;
+          right: 0 !important;
+          left: 0 !important;
+          transition: transform 0.3s, opacity 0.3s;
+          transform: translateY(100%);
+          will-change: transform, opacity;
+          max-height: 80%;
+          padding-top: 25px;
+          overflow: hidden;
+          overflow-y: auto;
+          @apply(--shadow-elevation-4dp);
+
+          @apply(--icon-popup-content-narrow);
+        }
+
+        #closeSlider {
+          display: block;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          background-color: #F5F5F5;
+          height: 25px;
+          @apply(--layout-horizontal);
+          @apply(--layout-center-center);
+
+          @apply(--icon-popup-slider);
+        }
       }
     </style>
-    
+    <iron-media-query
+      on-query-matches-changed="_onQueryMatchesChanged"
+      query="(min-width: 0) and (max-width: 480px)">
+    </iron-media-query>
+
+    <div id="closeSlider" on-tap="_handleSliderTap" on-track="_handleSliderTrack">
+      <content select="[popup-slider]"></content>
+    </div>
     <content></content>
   </template>
 </dom-module>
@@ -33,8 +84,219 @@ Wraps the content for `icon-popup`. Uses `iron-overlay-behavior` to act like a d
   Polymer({
     is: 'icon-popup-content',
 
-    behaviors: [
-      Polymer.IronOverlayBehavior
-    ]
+    properties: {
+
+      /**
+       * Indicates if the popup is currently dragged by the user.
+       */
+      dragging: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        readOnly: true
+      },
+
+      isOpen: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+
+      _isNarrow: {
+        type: Boolean,
+        value: false
+      },
+
+      _hasWillChange: {
+        type: Boolean,
+        value: function() {
+          return 'willChange' in this.style;
+        }
+      },
+
+      _onDocClickHandler: {
+        type: Object,
+        value: function() {
+          return this._onDocClick.bind(this);
+        }
+      }
+    },
+
+    listeners: {
+      'transitionend': '_transitionFinished',
+      'click': '_onClick'
+    },
+
+    ready: function() {
+      this._prepPopup();
+    },
+
+    detached: function() {
+      // Make sure the event handler is removed if the popup is detached while open.
+      document.removeEventListener('click', this._onDocClickHandler, true);
+    },
+
+    _onQueryMatchesChanged: function(e) {
+      this._isNarrow = e.detail.value;
+      this._prepPopup();
+    },
+
+    _prepPopup: function() {
+      if (this._isNarrow) {
+        this.style.display = 'block';
+        this._movePopup(this.isOpen ? '0' : '100', '%');
+      } else {
+        this.style.display = this.isOpen ? 'block' : 'none';
+        this.style.transform = 'initial';
+      }
+    },
+
+    _handleSliderTap: function () {
+      this.close();
+    },
+
+    _handleSliderTrack: function(e) {
+      if (!this._isNarrow) return;
+
+      switch(e.detail.state) {
+        case 'start':
+          this._trackStart();
+          break;
+        case 'track':
+          this._trackY(e);
+          break;
+        case 'end':
+          this._trackEnd();
+          break;
+      }
+    },
+
+    open: function() {
+      if (this._isNarrow) {
+        this._movePopup('0', '%');
+      } else {
+        this.style.display = 'block';
+      }
+      this._trackYstart = 0;
+      this.isOpen = true;
+
+      document.addEventListener('click', this._onDocClickHandler, true);
+    },
+
+    close: function () {
+      if (this._isNarrow) {
+        this._movePopup('100', '%');
+      } else {
+        this.style.display = 'none';
+      }
+      this.isOpen = false;
+
+      document.removeEventListener('click', this._onDocClickHandler, true);
+    },
+
+    _onClick: function(e) {
+      // If click occured on the dialog, cancel the document click job.
+      if (this._docClickJob) {
+        this.cancelAsync(this._docClickJob);
+        this._docClickJob = null;
+      }
+
+      var target = e.target;
+      while (target && target !== this) {
+        if (target.hasAttribute) {
+          if (target.hasAttribute('popup-close')) {
+            this.close();
+            break;
+          }
+        }
+        target = target.parentNode;
+      }
+    },
+
+    _onDocClick: function() {
+      this._docClickJob = this.async(function() {
+        this.close();
+      }, 10);
+    },
+
+    _trackStart: function() {
+      this._setDragging(true);
+      if (!this._trackYstart) {
+        this._trackYstart = 0;
+
+        // Save height to calc moment when the popup is considered to close.
+        this._height = this.offsetHeight;
+      }
+      this._origTransition = this.style.transition;
+      this.style.transition = 'unset';
+    },
+
+    _trackEnd: function() {
+      this._setDragging(false);
+
+      // Set new starting point for next tracking.
+      this._trackYstart = this._dy;
+      this.style.transition = this._origTransition;
+
+      if (this._flickClose) {
+        this._flickClose = false;
+        this.style.opacity = 1;
+        return;
+      }
+
+      if (this._closeTriggered) {
+        this.close();
+      } else {
+        this.open();
+        this.style.opacity = 1;
+      }
+    },
+
+    _trackY: function(e) {
+      if (this.dragging) {
+
+        // If ddy > 10 we consider this a flick and close the popup
+        if (e.detail.ddy >= 20) {
+          this._setDragging(false);
+          this._flickClose = true;
+          this.close();
+          return;
+        }
+
+        this._dy = this._translateYForDeltaY(e.detail.dy);
+        this._movePopup(this._dy);
+
+        // Calc opacity to indicate that the popup will close.
+        var opacity = Math.max(0.4, 1 - this._dy / this._height);
+        this.style.opacity = opacity;
+
+        this._closeTriggered = opacity == 0.4;
+      }
+    },
+
+    _translateYForDeltaY: function(dy) {
+      return Math.max(0, dy + this._trackYstart);
+    },
+
+    _transformForTranslateY: function(y, unit) {
+      if (y === null) {
+        return '';
+      }
+
+      return this._hasWillChange ? 'translateY(' + y + unit + ')' :
+      'translate3d(0, ' + y + unit + ', 0)';
+    },
+
+    _movePopup: function(y, unit) {
+      unit = unit || 'px';
+      this.transform(this._transformForTranslateY(y, unit), this);
+    },
+
+    _transitionFinished: function() {
+      if (!this.isOpen) {
+        this.style.opacity = 1;
+        this._trackYstart = 0;
+      }
+    }
   });
 </script>

@@ -32,8 +32,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           /* styles for the popup content go here */
         };
 
-        --icon-popup-content: {
-          /* styles for the popup content go here */
+        --icon-popup-content-narrow: {
+          background-color: #e4e4e4;
         };
 
         --icon-popup-icon: {
@@ -77,6 +77,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --icon-popup-icon-disabled: {
           color: #c1c1c1;
         };
+
+        --icon-popup-content-narrow: {
+          color: #fff;
+          background-color: #1aa46b;
+          padding-top: 40px;
+        };
+
+        --icon-popup-slider: {
+          background-color: #0e7c4e
+        };
       }
   </style>
 
@@ -86,7 +96,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <p>An example of <code>&lt;icon-popup&gt;</code>:</p>
 
 <icon-popup valign="bottom" style="position: absolute; left: 10%; top: 50%;">
-  <fa-awesome icon="flag">Open me!</fa-awesome>
+  <fa-awesome popup-icon icon="flag">Open me!</fa-awesome>
+  <fa-awesome popup-slider icon="angle-down"></fa-awesome>
   <div popup style="white-space: nowrap;">
     <p>This popup opens under the icon.</p>
     <p>But only if there is enough space left in you brower.</p>
@@ -94,8 +105,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </icon-popup>
 
 <icon-popup valign="top" halign="right" class="whatsapp-icon-popup" style="position: absolute; left: 50%; top: 50%;">
-  <fa-awesome icon="whatsapp"></fa-awesome>
-  <div popup style="white-space: nowrap;">Everybody uses <strong>whatsapp</strong>.</div>
+  <fa-awesome popup-icon icon="whatsapp"></fa-awesome>
+  <fa-awesome popup-slider icon="angle-double-down"></fa-awesome>
+  <div popup style="white-space: nowrap;">
+    Everybody uses <strong>whatsapp</strong>.<br>
+    <button popup-close>That's cool</button>
+  </div>
 </icon-popup>
 
 </body>
