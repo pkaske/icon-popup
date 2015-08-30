@@ -11,14 +11,19 @@ Or see the LICENSE file that comes with this code.
 
 <!--
 Consists of a icon and a popup dialog. The icon toggles visibility of the popup.
+
 The popup content switches into a mobile friendly mode if opened on a small screen.
-It then fixiates on the bottom of the window and slide up and down filling the whole with of the screen.
+It's then fixed on the bottom of the window and slide up and down filling the whole with of the screen.
+You can provide a `popup-slider` icon to show in the responsive version that indicates touch actions.
+
+If any control inside the popup has the `popup-close` attribute, it triggers the `close()` function on click.
 
 Example
 
 ```html
     <icon-popup>
-      <fa-awesome icon="flag"></fa-awesome>
+      <fa-awesome popup-icon icon="flag"></fa-awesome>
+      <fa-awesome popup-slider icon="angle-down"></fa-awesome>
       <div popup>
         Hi! I'm popup!
         <button popup-close>Close the popup</button>
@@ -101,6 +106,9 @@ Example
       'click': '_cancelDocClickJob'
     },
 
+    /**
+     * Get the popup element.
+     */
     get popup() {
       return this.$.popup;
     },
@@ -124,7 +132,7 @@ Example
     },
 
     /**
-     * Toggles the state of `icon-popup`.
+     * Toggles the state of the `popup`.
      */
     toggle: function() {
       this._togglePopup();
